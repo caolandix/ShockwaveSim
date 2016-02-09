@@ -11,10 +11,17 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
         mainwindow.cpp \
-        qcustomplot.cpp
+        qcustomplot.cpp \
+    shockwavecalculations.cpp \
+    shockwaveparams.cpp \
+    shockwavedataobj.cpp
 
 HEADERS  += mainwindow.h \
-         qcustomplot.h
+         qcustomplot.h \
+    shockwavecalculations.h \
+    shockwaveparams.h \
+    shockwavedataobj.h
 
-FORMS    += mainwindow.ui
+FORMS    += mainwindow.ui \
+    shockwaveparams.ui
 
