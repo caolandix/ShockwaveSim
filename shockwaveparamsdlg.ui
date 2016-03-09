@@ -567,7 +567,7 @@
   <connection>
    <sender>btnsOkayCancelApply</sender>
    <signal>accepted()</signal>
-   <receiver>ShockwaveParamsDlg</receiver>
+   <receiver>ShockwaveParams</receiver>
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -583,7 +583,7 @@
   <connection>
    <sender>btnsOkayCancelApply</sender>
    <signal>rejected()</signal>
-   <receiver>ShockwaveParamsDlg</receiver>
+   <receiver>ShockwaveParams</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">

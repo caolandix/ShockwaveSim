@@ -1,6 +1,6 @@
 #include "shockwavedataobj.h"
 
-ShockwaveDataObj::ShockwaveDataObj() {
+ShockwaveDataObj::ShockwaveDataObj(const double idealGasConst, const double gamma) {
     m_soundSpeed = 0.0;
     m_magFieldStr = 0.0;
     m_constPressSpecificHeat = 0.0;
