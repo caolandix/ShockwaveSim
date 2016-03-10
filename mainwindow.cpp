@@ -85,16 +85,18 @@ void MainWindow::titleDoubleClick(QMouseEvent *pEvent, QCPPlotTitle *pTitle) {
 }
 
 void MainWindow::axisLabelDoubleClick(QCPAxis *pAxis, QCPAxis::SelectablePart part) {
+    if (pAxis) {
 
-    // Set an axis label by double clicking on it
-    if (part == QCPAxis::spAxisLabel) {
+        // Set an axis label by double clicking on it
+        if (part == QCPAxis::spAxisLabel) {
 
-         // only react when the actual axis label is clicked, not tick label or axis backbone
-        bool bOK;
-        QString newLabel = QInputDialog::getText(this, "QCustomPlot example", "New axis label:", QLineEdit::Normal, pAxis ->label(), &bOK);
-        if (bOK)  {
-            pAxis ->setLabel(newLabel);
-            ui ->customPlot ->replot();
+             // only react when the actual axis label is clicked, not tick label or axis backbone
+            bool bOK;
+            QString newLabel = QInputDialog::getText(this, "QCustomPlot example", "New axis label:", QLineEdit::Normal, pAxis ->label(), &bOK);
+            if (bOK)  {
+                pAxis ->setLabel(newLabel);
+                ui ->customPlot ->replot();
+            }
         }
     }
 }
@@ -104,7 +106,7 @@ void MainWindow::legendDoubleClick(QCPLegend *pLegend, QCPAbstractLegendItem *pI
     // Rename a graph by double clicking on its legend item
     Q_UNUSED(pLegend)
 
-    if (pItem) {
+    if (pItem ) {
 
          // only react if item was clicked (user could have clicked on border padding of legend where there is no item, then item is 0)
         QCPPlottableLegendItem *plItem = qobject_cast<QCPPlottableLegendItem *>(pItem);
@@ -201,7 +203,7 @@ void MainWindow::addRandomGraph() {
     if (rand() % 100 > 50)
         ui ->customPlot ->graph() ->setScatterStyle(QCPScatterStyle((QCPScatterStyle::ScatterShape)(rand() % 14 + 1)));
     graphPen.setColor(QColor(rand() % 245 + 10, rand() % 245 + 10, rand() % 245 + 10));
-    graphPen.setWidthF(rand() / (double)RAND_MAX*2+1);
+    graphPen.setWidthF(rand() / (double)RAND_MAX * 2 + 1);
     ui ->customPlot ->graph() ->setPen(graphPen);
     ui ->customPlot ->replot();
 }

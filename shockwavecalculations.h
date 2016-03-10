@@ -8,9 +8,10 @@ public:
     ShockWaveCalculations(const ShockwaveDataObj &);
     ~ShockWaveCalculations();
 
-    void rhTemperature(double *, const double, const double);
-    void rhStaticPressure(double *, const double, const double);
-    void rhDensityVelocity(double *, const double, const double);
+
+    double rhTemperature();
+    double rhStaticPressure();
+    double rhDensityVelocity();
 
 private:
     ShockwaveDataObj m_ShockwaveData;
