@@ -5,17 +5,27 @@
 #include <QInputDialog>
 #include "../../qcustomplot.h"
 
+#include "shockwavedataobj.h"
+#include "shockwaveparamsdlg.h"
+
 namespace Ui {
     class MainWindow;
 }
 
 class MainWindow : public QMainWindow {
-Q_OBJECT
-
+    Q_OBJECT
 public:
     void axisLabelDoubleClick(QCPAxis *pAxis, QCPAxis::SelectablePart part);
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
+
+private:
+    void setupGraph();
+    void setupGraphConnections();
+    void setupUIComponents();
+
+signals:
+    void redrawGraph();
 
 private slots:
     void titleDoubleClick(QMouseEvent *pEvent, QCPPlotTitle *pTitle);
@@ -29,9 +39,14 @@ private slots:
     void contextMenuRequest(QPoint pos);
     void moveLegend();
     void graphClicked(QCPAbstractPlottable *pPlottable);
+    void onShockwaveProperties();
+    void onAbout();
+    void onPrint();
+    void onRedrawGraph();
 
 private:
     Ui::MainWindow *ui;
+    ShockwaveDataObj m_sw;
 };
 
 #endif // MAINWINDOW_H

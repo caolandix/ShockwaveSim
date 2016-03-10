@@ -1,30 +1,29 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include "shockwaveparamsdlg.h"
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow) {
-    QFont legendFont = font();
-    legendFont.setPointSize(10);
-
-    srand(QDateTime::currentDateTime().toTime_t());
     ui -> setupUi(this);
-    ui -> customPlot ->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectAxes | QCP::iSelectLegend | QCP::iSelectPlottables);
-    ui ->customPlot ->xAxis ->setRange(-8, 8);
-    ui ->customPlot ->yAxis->setRange(-5, 5);
-    ui ->customPlot ->axisRect() ->setupFullAxesBox();
-    ui ->customPlot ->plotLayout() ->insertRow(0);
-    ui ->customPlot ->plotLayout() ->addElement(0, 0, new QCPPlotTitle(ui ->customPlot, "Interaction Example"));
-    ui ->customPlot ->xAxis ->setLabel("x Axis");
-    ui ->customPlot ->yAxis ->setLabel("y Axis");
-    ui ->customPlot ->legend ->setVisible(true);
-    ui ->customPlot ->legend ->setFont(legendFont);
-    ui ->customPlot ->legend ->setSelectedFont(legendFont);
-    ui ->customPlot ->legend ->setSelectableParts(QCPLegend::spItems); // legend box shall not be selectable, only legend items
 
-    addRandomGraph();
-    addRandomGraph();
-    addRandomGraph();
-    addRandomGraph();
+    setupGraph();
+    setupGraphConnections();
+    setupUIComponents();
+}
 
+MainWindow::~MainWindow() {
+    delete ui;
+}
+
+void MainWindow::setupUIComponents() {
+    // setup Menu items with actions
+    connect(ui ->actionShockwave_Properties, SIGNAL(triggered()), this, SLOT(onShockwaveProperties()));
+    connect(ui ->actionExit, SIGNAL(triggered()), this, SLOT(close()));
+    connect(ui ->actionAbout, SIGNAL(triggered()), this, SLOT(onAbout()));
+    connect(ui ->actionPrint, SIGNAL(triggered()), this, SLOT(onPrint()));
+    connect(this, SIGNAL(redrawGraph()), this, SLOT(onRedrawGraph()));
+}
+
+void MainWindow::setupGraphConnections() {
     // connect slot that ties some axis selections together (especially opposite axes):
     connect(ui ->customPlot, SIGNAL(selectionChangedByUser()), this, SLOT(selectionChanged()));
 
@@ -49,8 +48,28 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     connect(ui ->customPlot, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(contextMenuRequest(QPoint)));
 }
 
-MainWindow::~MainWindow() {
-    delete ui;
+void MainWindow::setupGraph() {
+    QFont legendFont = font();
+    legendFont.setPointSize(10);
+
+    srand(QDateTime::currentDateTime().toTime_t());
+    ui -> customPlot ->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectAxes | QCP::iSelectLegend | QCP::iSelectPlottables);
+    ui ->customPlot ->xAxis ->setRange(-8, 8);
+    ui ->customPlot ->yAxis->setRange(-5, 5);
+    ui ->customPlot ->axisRect() ->setupFullAxesBox();
+    ui ->customPlot ->plotLayout() ->insertRow(0);
+    ui ->customPlot ->plotLayout() ->addElement(0, 0, new QCPPlotTitle(ui ->customPlot, "Shockwave Simulation"));
+    ui ->customPlot ->xAxis ->setLabel("x Axis");
+    ui ->customPlot ->yAxis ->setLabel("y Axis");
+    ui ->customPlot ->legend ->setVisible(true);
+    ui ->customPlot ->legend ->setFont(legendFont);
+    ui ->customPlot ->legend ->setSelectedFont(legendFont);
+    ui ->customPlot ->legend ->setSelectableParts(QCPLegend::spItems); // legend box shall not be selectable, only legend items
+
+    addRandomGraph();
+    addRandomGraph();
+    addRandomGraph();
+    addRandomGraph();
 }
 
 void MainWindow::titleDoubleClick(QMouseEvent *pEvent, QCPPlotTitle *pTitle) {
@@ -137,7 +156,7 @@ void MainWindow::mousePress() {
 
     if (ui ->customPlot ->xAxis ->selectedParts().testFlag(QCPAxis::spAxis))
         ui ->customPlot ->axisRect() ->setRangeDrag(ui ->customPlot ->xAxis ->orientation());
-    else if (ui ->customPlot->yAxis ->selectedParts().testFlag(QCPAxis::spAxis))
+    else if (ui ->customPlot ->yAxis ->selectedParts().testFlag(QCPAxis::spAxis))
         ui ->customPlot ->axisRect() ->setRangeDrag(ui ->customPlot ->yAxis ->orientation());
     else
         ui ->customPlot ->axisRect() ->setRangeDrag(Qt::Horizontal | Qt::Vertical);
@@ -195,8 +214,8 @@ void MainWindow::removeSelectedGraph() {
 }
 
 void MainWindow::removeAllGraphs() {
-    ui->customPlot->clearGraphs();
-    ui->customPlot->replot();
+    ui ->customPlot ->clearGraphs();
+    ui ->customPlot ->replot();
 }
 
 void MainWindow::contextMenuRequest(QPoint pos) {
@@ -240,4 +259,26 @@ void MainWindow::moveLegend() {
 
 void MainWindow::graphClicked(QCPAbstractPlottable *pPlottable) {
     ui ->statusBar ->showMessage(QString("Clicked on graph '%1'.").arg(pPlottable ->name()), 1000);
+}
+
+void MainWindow::onShockwaveProperties() {
+    ShockwaveParamsDlg dlg(this);
+    dlg.setShockwaveDataProps(m_sw);
+
+    if (dlg.exec() == QDialog::Accepted) {
+        dlg.getShockwaveDataProps(m_sw);
+        emit redrawGraph();
+    }
+}
+
+void MainWindow::onAbout() {
+
+}
+
+void MainWindow::onPrint() {
+
+}
+
+void MainWindow::onRedrawGraph() {
+
 }

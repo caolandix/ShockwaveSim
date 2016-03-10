@@ -17,6 +17,10 @@ public:
     void setShockwaveDataProps(const ShockwaveDataObj &);
     void getShockwaveDataProps(ShockwaveDataObj &);
 
+private slots:
+    void onOKButtonClicked();
+    void onCancelButtonClicked();
+
 private:
     Ui::ShockwaveParamsDlg *ui;
 };

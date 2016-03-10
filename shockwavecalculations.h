@@ -5,11 +5,15 @@
 
 class ShockWaveCalculations {
 public:
-    ShockWaveCalculations();
+    ShockWaveCalculations(const ShockwaveDataObj &);
     ~ShockWaveCalculations();
 
+    void rhTemperature(double *, const double, const double);
+    void rhStaticPressure(double *, const double, const double);
+    void rhDensityVelocity(double *, const double, const double);
+
 private:
-    ShockwaveDataObj *m_pShockwave;
+    ShockwaveDataObj m_ShockwaveData;
 };
 
 #endif // SHOCKWAVECALCULATIONS_H
