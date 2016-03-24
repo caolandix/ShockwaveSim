@@ -15,7 +15,6 @@ namespace Ui {
 class MainWindow : public QMainWindow {
     Q_OBJECT
 public:
-    void axisLabelDoubleClick(QCPAxis *pAxis, QCPAxis::SelectablePart part);
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
@@ -29,6 +28,7 @@ signals:
 
 private slots:
     void titleDoubleClick(QMouseEvent *pEvent, QCPPlotTitle *pTitle);
+    void axisLabelDoubleClick(QCPAxis *pAxis, QCPAxis::SelectablePart part);
     void legendDoubleClick(QCPLegend *pLegend, QCPAbstractLegendItem *pItem);
     void selectionChanged();
     void mousePress();
