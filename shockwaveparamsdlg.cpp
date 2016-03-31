@@ -28,7 +28,8 @@ void ShockwaveParamsDlg::setShockwaveDataProps(const ShockwaveDataObj &obj) {
     ui ->edtPressure ->setText(QString::number(obj.p()));
     ui ->edtRadialDist ->setText(QString::number(obj.r()));
     ui ->edtEntropy ->setText(QString::number(obj.s()));
-    ui ->edtTemperature ->setText(QString::number(obj.T()));
+    ui ->edtTempR1 ->setText(QString::number(obj.T1()));
+    ui ->edtTempR2 ->setText(QString::number(obj.T2()));
     ui ->edtTime ->setText(QString::number(obj.t()));
     ui ->edtVelocity ->setText(QString::number(obj.u()));
     ui ->edtSpecificVol ->setText(QString::number(obj.v()));
@@ -46,7 +47,8 @@ void ShockwaveParamsDlg::getShockwaveDataProps(ShockwaveDataObj &obj) {
     obj.p(ui ->edtPressure ->text().toDouble());
     obj.r(ui ->edtRadialDist ->text().toDouble());
     obj.s(ui ->edtEntropy ->text().toDouble());
-    obj.T(ui ->edtTemperature ->text().toDouble());
+    obj.T1(ui ->edtTempR1 ->text().toDouble());
+    obj.T2(ui ->edtTempR2 ->text().toDouble());
     obj.t(ui ->edtTime ->text().toDouble());
     obj.u(ui ->edtVelocity ->text().toDouble());
     obj.v(ui ->edtSpecificVol ->text().toDouble());
