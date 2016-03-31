@@ -14,13 +14,15 @@ SOURCES += main.cpp\
         qcustomplot.cpp \
     shockwavecalculations.cpp \
     shockwavedataobj.cpp \
-    shockwaveparamsdlg.cpp
+    shockwaveparamsdlg.cpp \
+    shockregion.cpp
 
 HEADERS  += mainwindow.h \
          qcustomplot.h \
     shockwavecalculations.h \
     shockwavedataobj.h \
-    shockwaveparamsdlg.h
+    shockwaveparamsdlg.h \
+    shockregion.h
 
 FORMS    += mainwindow.ui \
     shockwaveparamsdlg.ui
