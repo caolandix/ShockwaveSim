@@ -14,3 +14,10 @@ ShockRegion &ShockRegion::operator=(const ShockRegion &obj) {
     }
     return *this;
 }
+
+// other overloads
+bool ShockRegion::operator==(const ShockRegion &obj) {
+    if (m_Temperature != obj.Temperature())
+        return false;
+    return true;
+}
