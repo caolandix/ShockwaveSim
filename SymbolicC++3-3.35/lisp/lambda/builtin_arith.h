@@ -24,6 +24,7 @@
 #ifndef BUILTIN_ARITH_H
 #define BUILTIN_ARITH_H
 
+#include <cmath>
 #include "expression.h"
 
 expression builtin_add(expression &e,environment &env)
