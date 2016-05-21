@@ -23,6 +23,10 @@ private:
     void setupGraphConnections();
     void setupUIComponents();
 
+    // scientific functions
+    double mach(const double temperature, const double gamma, const double speedOfSound);
+    double speedOfSound(const double gamma, const double gasConst, const temperature);
+
 signals:
     void redrawGraph();
 

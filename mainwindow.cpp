@@ -179,14 +179,28 @@ void MainWindow::executeGraph() {
     int n = 50;
     QVector<double> x(n), y(n);
 
-    double xScale = (rand() / (double)RAND_MAX + 0.5) * 2;
-    double yScale = (rand() / (double)RAND_MAX + 0.5) * 2;
-    double xOffset = (rand() / (double)RAND_MAX - 0.5) * 4;
-    double yOffset = (rand() / (double)RAND_MAX - 0.5) * 5;
+/*
     double r1 = (rand() / (double)RAND_MAX - 0.5) * 2;
-    double r2 = (rand() / (double)RAND_MAX - 0.5) * 2;
-    double r3 = (rand() / (double)RAND_MAX - 0.5) * 2;
-    double r4 = (rand() / (double)RAND_MAX - 0.5) * 2;
+*/
+
+    const double k = 1.4;                   // specific heat of air, aka: gamma -- https://www.grc.nasa.gov/www/k-12/airplane/specheat.html
+    const double gasConst = 286.0;          // gas const for air
+    double radius = 3.0;                    // radius of spherical incident shock in meters
+    double temp1, temp2, vel1, vel2;
+    double mach1, mach2;
+    double currSpeedOfSound;
+    double x_TransmittedSF;                 // X_i -- X-coord of the transmitted shockfront (SF)
+    double x_IncidentSF;                 // x_i -- X-coord of the Incident shockfront (SF)
+
+    // temperature in Celcius
+    temp1 = 100.0, temp2 = 200.0;
+
+    // velocity of cool gas (m/s)
+    vel1 = 12.0;
+    mach1 = mach(temp1, k, currSpeedOfSound = speedOfSound(k, gasConst, temp1));
+    mach2 = mach(temp2, k, currSpeedOfSound = speedOfSound(k, gasConst, temp2));
+    vel2 = (sqrt(temp2 / temp1) * (mach2 / mach1)) * vel1;
+
     for (int i = 0; i < n; i++) {
         x[i] = i;
         y[i] = x[i] * x[i] + x[i] - 2;
@@ -201,6 +215,14 @@ void MainWindow::executeGraph() {
     graphPen.setWidthF(3);
     ui ->customPlot ->graph() ->setPen(graphPen);
     ui ->customPlot ->replot();
+}
+
+double MainWindow::speedOfSound(const double gamma, const double gasConst, const temperature) {
+    return sqrt(gamma * gasConst * (273.15 + temperature));
+}
+
+double MainWindow::mach(const double temperature, const double gamma, const double speedOfSound) {
+
 }
 
 void MainWindow::removeSelectedGraph() {
