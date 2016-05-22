@@ -176,8 +176,8 @@ void MainWindow::mouseWheel() {
 void MainWindow::executeGraph() {
 
     // number of points in graph
-    int n = 50;
-    QVector<double> x(n), y(n);
+    int numGraphPoints = 50;
+    QVector<double> x(numGraphPoints), y(numGraphPoints);
 
 /*
     double r1 = (rand() / (double)RAND_MAX - 0.5) * 2;
@@ -190,20 +190,20 @@ void MainWindow::executeGraph() {
     double mach1, mach2;
     double currSpeedOfSound;
     double x_TransmittedSF;                 // X_i -- X-coord of the transmitted shockfront (SF)
-    double x_IncidentSF;                 // x_i -- X-coord of the Incident shockfront (SF)
+    int x_IncidentSF;                 // x_i -- X-coord of the Incident shockfront (SF)
 
     // temperature in Celcius
     temp1 = 100.0, temp2 = 200.0;
 
     // velocity of cool gas (m/s)
     vel1 = 12.0;
-    mach1 = mach(temp1, k, currSpeedOfSound = speedOfSound(k, gasConst, temp1));
-    mach2 = mach(temp2, k, currSpeedOfSound = speedOfSound(k, gasConst, temp2));
+    mach1 = mach(temp1, speedOfSound(k, gasConst, temp1));
+    mach2 = mach(temp2, speedOfSound(k, gasConst, temp2));
     vel2 = (sqrt(temp2 / temp1) * (mach2 / mach1)) * vel1;
 
-    for (int i = 0; i < n; i++) {
-        x[i] = i;
-        y[i] = x[i] * x[i] + x[i] - 2;
+    for (x_IncidentSF = 0; x_IncidentSF < numGraphPoints; x_IncidentSF++) {
+        x[x_IncidentSF] = (vel2 / vel1 - 1) * (radius - x_IncidentSF);
+        y[x_IncidentSF] = 0;
     }
 
     QPen graphPen;
@@ -217,12 +217,12 @@ void MainWindow::executeGraph() {
     ui ->customPlot ->replot();
 }
 
-double MainWindow::speedOfSound(const double gamma, const double gasConst, const temperature) {
+double MainWindow::speedOfSound(const double gamma, const double gasConst, const double temperature) {
     return sqrt(gamma * gasConst * (273.15 + temperature));
 }
 
-double MainWindow::mach(const double temperature, const double gamma, const double speedOfSound) {
-
+double MainWindow::mach(const double velocity, const double currSpeedOfSound) {
+    return (currSpeedOfSound != 0.0) ? velocity / currSpeedOfSound : 0.0;
 }
 
 void MainWindow::removeSelectedGraph() {
