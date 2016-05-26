@@ -9,8 +9,6 @@ ShockWaveCalculations::ShockWaveCalculations(const ShockwaveDataObj &obj) {
 ShockWaveCalculations::~ShockWaveCalculations() {
 }
 
-//double ShockWaveCalculations::
-
 double ShockWaveCalculations::rhTemperature() {
     return (((1 + (m_ShockwaveData.gamma() - 1)) / 2) * pow(m_ShockwaveData.M(), 2)) * ((((2 * m_ShockwaveData.gamma()) / (m_ShockwaveData.gamma() - 1)) * (pow(m_ShockwaveData.M(), 2) - 1)) /
             (pow(m_ShockwaveData.M(), 2) * (((2 * m_ShockwaveData.gamma()) / (m_ShockwaveData.gamma() - 1)) + ((m_ShockwaveData.gamma() - 1) / 2))));

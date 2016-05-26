@@ -23,10 +23,6 @@ private:
     void setupGraphConnections();
     void setupUIComponents();
 
-    // scientific functions
-    double mach(const double velocity, const double speedOfSound);
-    double speedOfSound(const double gamma, const double gasConst, const double temperature);
-
 signals:
     void redrawGraph();
 
@@ -37,7 +33,7 @@ private slots:
     void selectionChanged();
     void mousePress();
     void mouseWheel();
-    void executeGraph();
+    void addRandomGraph();
     void removeSelectedGraph();
     void removeAllGraphs();
     void contextMenuRequest(QPoint pos);

@@ -66,7 +66,10 @@ void MainWindow::setupGraph() {
     ui ->customPlot ->legend ->setSelectedFont(legendFont);
     ui ->customPlot ->legend ->setSelectableParts(QCPLegend::spItems); // legend box shall not be selectable, only legend items
 
-    executeGraph();
+    addRandomGraph();
+    addRandomGraph();
+    addRandomGraph();
+    addRandomGraph();
 }
 
 void MainWindow::titleDoubleClick(QMouseEvent *pEvent, QCPPlotTitle *pTitle) {
@@ -173,56 +176,36 @@ void MainWindow::mouseWheel() {
         ui ->customPlot ->axisRect() ->setRangeZoom(Qt::Horizontal | Qt::Vertical);
 }
 
-void MainWindow::executeGraph() {
+void MainWindow::addRandomGraph() {
 
     // number of points in graph
-    int numGraphPoints = 50;
-    QVector<double> x(numGraphPoints), y(numGraphPoints);
+    int n = 50;
+    QVector<double> x(n), y(n);
 
-/*
+    double xScale = (rand() / (double)RAND_MAX + 0.5) * 2;
+    double yScale = (rand() / (double)RAND_MAX + 0.5) * 2;
+    double xOffset = (rand() / (double)RAND_MAX - 0.5) * 4;
+    double yOffset = (rand() / (double)RAND_MAX - 0.5) * 5;
     double r1 = (rand() / (double)RAND_MAX - 0.5) * 2;
-*/
-
-    const double k = 1.4;                   // specific heat of air, aka: gamma -- https://www.grc.nasa.gov/www/k-12/airplane/specheat.html
-    const double gasConst = 286.0;          // gas const for air
-    double radius = 3.0;                    // radius of spherical incident shock in meters
-    double temp1, temp2, vel1, vel2;
-    double mach1, mach2;
-    double currSpeedOfSound;
-    double x_TransmittedSF;                 // X_i -- X-coord of the transmitted shockfront (SF)
-    int x_IncidentSF;                 // x_i -- X-coord of the Incident shockfront (SF)
-
-    // temperature in Celcius
-    temp1 = 100.0, temp2 = 200.0;
-
-    // velocity of cool gas (m/s)
-    vel1 = 12.0;
-    mach1 = mach(temp1, speedOfSound(k, gasConst, temp1));
-    mach2 = mach(temp2, speedOfSound(k, gasConst, temp2));
-    vel2 = (sqrt(temp2 / temp1) * (mach2 / mach1)) * vel1;
-
-    for (x_IncidentSF = 0; x_IncidentSF < numGraphPoints; x_IncidentSF++) {
-        x[x_IncidentSF] = (vel2 / vel1 - 1) * (radius - x_IncidentSF);
-        y[x_IncidentSF] = 0;
+    double r2 = (rand() / (double)RAND_MAX - 0.5) * 2;
+    double r3 = (rand() / (double)RAND_MAX - 0.5) * 2;
+    double r4 = (rand() / (double)RAND_MAX - 0.5) * 2;
+    for (int i = 0; i < n; i++) {
+        x[i] = (i / (double)n - 0.5) * 10.0 * xScale + xOffset;
+        y[i] = (qSin(x[i] * r1 * 5) * qSin(qCos(x[i] * r2) * r4 * 3) + r3 * qCos(qSin(x[i]) * r4 * 2)) * yScale + yOffset;
     }
 
     QPen graphPen;
     ui ->customPlot ->addGraph();
     ui ->customPlot ->graph() ->setName(QString("New graph %1").arg(ui ->customPlot ->graphCount() - 1));
     ui ->customPlot ->graph() ->setData(x, y);
-    ui ->customPlot ->graph() ->setLineStyle(QCPGraph::lsLine);
-    graphPen.setColor(QColor(Qt::black));
-    graphPen.setWidthF(3);
+    ui ->customPlot ->graph() ->setLineStyle((QCPGraph::LineStyle)(rand()%5+1));
+    if (rand() % 100 > 50)
+        ui ->customPlot ->graph() ->setScatterStyle(QCPScatterStyle((QCPScatterStyle::ScatterShape)(rand() % 14 + 1)));
+    graphPen.setColor(QColor(rand() % 245 + 10, rand() % 245 + 10, rand() % 245 + 10));
+    graphPen.setWidthF(rand() / (double)RAND_MAX * 2 + 1);
     ui ->customPlot ->graph() ->setPen(graphPen);
     ui ->customPlot ->replot();
-}
-
-double MainWindow::speedOfSound(const double gamma, const double gasConst, const double temperature) {
-    return sqrt(gamma * gasConst * (273.15 + temperature));
-}
-
-double MainWindow::mach(const double velocity, const double currSpeedOfSound) {
-    return (currSpeedOfSound != 0.0) ? velocity / currSpeedOfSound : 0.0;
 }
 
 void MainWindow::removeSelectedGraph() {
