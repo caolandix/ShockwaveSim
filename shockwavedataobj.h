@@ -28,7 +28,8 @@ public:
     void R(const double val) { m_idealGasConst = val; }
     void r(const double val) { m_radialDist = val; }
     void s(const double val) { m_Entropy = val; }
-    void T(const double val) { m_Temperature = val; }
+    void T1(const double val) { m_TempRegion1 = val; }
+    void T2(const double val) { m_TempRegion2 = val; }
     void t(const double val) { m_Time = val; }
     void u(const double val) { m_Velocity = val; }
     void v(const double val) { m_specificVol = val; }
@@ -60,7 +61,8 @@ public:
     double R() const { return m_idealGasConst; }
     double r() const { return m_radialDist; }
     double s() const { return m_Entropy; }
-    double T() const { return m_Temperature; }
+    double T1() const { return m_TempRegion1; }
+    double T2() const { return m_TempRegion2; }
     double t() const { return m_Time; }
     double u() const { return m_Velocity; }
     double v() const { return m_specificVol; }
@@ -94,7 +96,8 @@ private:
     double m_idealGasConst;                 // R: 208.13 m^2/s^2/K for argon
     double m_radialDist;                    // r
     double m_Entropy;                       // S
-    double m_Temperature;                   // T
+    double m_TempRegion1;                   // T1
+    double m_TempRegion2;                   // T2
     double m_Time;                          // t
     double m_Velocity;                      // u
     double m_specificVol;                   // v
