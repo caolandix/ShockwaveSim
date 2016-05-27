@@ -66,7 +66,10 @@ void MainWindow::setupGraph() {
     ui ->customPlot ->legend ->setSelectedFont(legendFont);
     ui ->customPlot ->legend ->setSelectableParts(QCPLegend::spItems); // legend box shall not be selectable, only legend items
 
-    executeGraph();
+    addRandomGraph();
+    addRandomGraph();
+    addRandomGraph();
+    addRandomGraph();
 }
 
 void MainWindow::titleDoubleClick(QMouseEvent *pEvent, QCPPlotTitle *pTitle) {
@@ -173,15 +176,11 @@ void MainWindow::mouseWheel() {
         ui ->customPlot ->axisRect() ->setRangeZoom(Qt::Horizontal | Qt::Vertical);
 }
 
-void MainWindow::executeGraph() {
+void MainWindow::addRandomGraph() {
 
     // number of points in graph
-    int numGraphPoints = 50;
-    QVector<double> x(numGraphPoints), y(numGraphPoints);
-
-/*
-    double r1 = (rand() / (double)RAND_MAX - 0.5) * 2;
-*/
+    int n = 50;
+    QVector<double> x(n), y(n);
 
     const double k = 1.4;                   // specific heat of air, aka: gamma -- https://www.grc.nasa.gov/www/k-12/airplane/specheat.html
     const double gasConst = 286.0;          // gas const for air
@@ -220,14 +219,6 @@ void MainWindow::executeGraph() {
     graphPen.setWidthF(3);
     ui ->customPlot ->graph() ->setPen(graphPen);
     ui ->customPlot ->replot();
-}
-
-double MainWindow::speedOfSound(const double gamma, const double gasConst, const double temperature) {
-    return sqrt(gamma * gasConst * (273.15 + temperature));
-}
-
-double MainWindow::mach(const double velocity, const double currSpeedOfSound) {
-    return (currSpeedOfSound != 0.0) ? velocity / currSpeedOfSound : 0.0;
 }
 
 void MainWindow::removeSelectedGraph() {

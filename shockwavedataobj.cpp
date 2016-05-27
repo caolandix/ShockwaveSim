@@ -22,8 +22,7 @@ ShockwaveDataObj::ShockwaveDataObj(const double idealGasConst, const double gamm
     m_heatRelParam = 0.0;
     m_radialDist = 0.0;
     m_Entropy = 0.0;
-    m_TempRegion1 = 0.0;
-    m_TempRegion2 = 0.0;
+    m_Temperature = 0.0;
     m_Time = 0.0;
     m_Velocity = 0.0;
     m_specificVol = 0.0;
