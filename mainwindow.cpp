@@ -188,12 +188,14 @@ void MainWindow::executeGraph() {
     double radius = 3.0;                    // radius of spherical incident shock in meters
     double temp1, temp2, vel1, vel2;
     double mach1, mach2;
-    double currSpeedOfSound;
     double x_TransmittedSF;                 // X_i -- X-coord of the transmitted shockfront (SF)
-    int x_IncidentSF;                 // x_i -- X-coord of the Incident shockfront (SF)
+    double y_TransmittedSF;                 // Y_i -- X-coord of the transmitted shockfront (SF)
+    double x_IncidentSF = 0.0;                       // x_i -- X-coord of the Incident shockfront (SF)
+    double y_IncidentSF = 0.0;                       // y_i -- X-coord of the Incident shockfront (SF)
+    double gamma = -atan2(vel1, vel2);
 
     // temperature in Celcius
-    temp1 = 100.0, temp2 = 200.0;
+    temp1 = 30.0, temp2 = 300.0;
 
     // velocity of cool gas (m/s)
     vel1 = 12.0;
@@ -201,17 +203,20 @@ void MainWindow::executeGraph() {
     mach2 = mach(temp2, speedOfSound(k, gasConst, temp2));
     vel2 = (sqrt(temp2 / temp1) * (mach2 / mach1)) * vel1;
 
-    for (x_IncidentSF = 0; x_IncidentSF < numGraphPoints; x_IncidentSF++) {
-        x[x_IncidentSF] = (vel2 / vel1 - 1) * (radius - x_IncidentSF);
-        y[x_IncidentSF] = 0;
+    for (int i = 0; i < numGraphPoints; i++) {
+        x[i] = x_TransmittedSF = (vel2 / vel2) * cos(gamma - 1) * (radius - x_IncidentSF);
+        y[i] = y_TransmittedSF = y_IncidentSF - ((vel2 / vel2) * sin(gamma) * (radius - x_IncidentSF));
+        x_IncidentSF += 0.1;
+        y_IncidentSF += 0.1;
     }
 
     QPen graphPen;
     ui ->customPlot ->addGraph();
     ui ->customPlot ->graph() ->setName(QString("New graph %1").arg(ui ->customPlot ->graphCount() - 1));
     ui ->customPlot ->graph() ->setData(x, y);
-    ui ->customPlot ->graph() ->setLineStyle(QCPGraph::lsLine);
-    graphPen.setColor(QColor(Qt::black));
+    ui ->customPlot ->graph() ->setLineStyle(QCPGraph::lsNone);
+    ui ->customPlot ->graph() ->setScatterStyle(QCPScatterStyle::ssDot);
+    graphPen.setColor(QColor(Qt::red));
     graphPen.setWidthF(3);
     ui ->customPlot ->graph() ->setPen(graphPen);
     ui ->customPlot ->replot();
