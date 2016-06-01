@@ -74,7 +74,7 @@ void MainWindow::titleDoubleClick(QMouseEvent *pEvent, QCPPlotTitle *pTitle) {
 
     // Set the plot title by double clicking on it
     bool bOK;
-    QString newTitle = QInputDialog::getText(this, "QCustomPlot example", "New plot title:", QLineEdit::Normal, pTitle ->text(), &bOK);
+    QString newTitle = QInputDialog::getText(this, "Shockwave Simulation", "New plot title:", QLineEdit::Normal, pTitle ->text(), &bOK);
     if (bOK) {
         pTitle ->setText(newTitle);
         ui ->customPlot ->replot();
@@ -89,7 +89,7 @@ void MainWindow::axisLabelDoubleClick(QCPAxis *pAxis, QCPAxis::SelectablePart pa
 
              // only react when the actual axis label is clicked, not tick label or axis backbone
             bool bOK;
-            QString newLabel = QInputDialog::getText(this, "QCustomPlot example", "New axis label:", QLineEdit::Normal, pAxis ->label(), &bOK);
+            QString newLabel = QInputDialog::getText(this, "Shockwave Simulation", "New axis label:", QLineEdit::Normal, pAxis ->label(), &bOK);
             if (bOK)  {
                 pAxis ->setLabel(newLabel);
                 ui ->customPlot ->replot();
@@ -108,7 +108,7 @@ void MainWindow::legendDoubleClick(QCPLegend *pLegend, QCPAbstractLegendItem *pI
          // only react if item was clicked (user could have clicked on border padding of legend where there is no item, then item is 0)
         QCPPlottableLegendItem *plItem = qobject_cast<QCPPlottableLegendItem *>(pItem);
         bool bOK;
-        QString newName = QInputDialog::getText(this, "QCustomPlot example", "New graph name:", QLineEdit::Normal, plItem ->plottable() ->name(), &bOK);
+        QString newName = QInputDialog::getText(this, "Shockwave Simulation", "New graph name:", QLineEdit::Normal, plItem ->plottable() ->name(), &bOK);
         if (bOK) {
             plItem ->plottable() ->setName(newName);
             ui ->customPlot ->replot();
@@ -172,44 +172,31 @@ void MainWindow::mouseWheel() {
     else
         ui ->customPlot ->axisRect() ->setRangeZoom(Qt::Horizontal | Qt::Vertical);
 }
-
 void MainWindow::executeGraph() {
-
-    // number of points in graph
-    int numGraphPoints = 50;
+    int numGraphPoints = 100;
     QVector<double> x(numGraphPoints), y(numGraphPoints);
-
-/*
-    double r1 = (rand() / (double)RAND_MAX - 0.5) * 2;
-*/
-
-    const double k = 1.4;                   // specific heat of air, aka: gamma -- https://www.grc.nasa.gov/www/k-12/airplane/specheat.html
-    const double gasConst = 286.0;          // gas const for air
-    double radius = 3.0;                    // radius of spherical incident shock in meters
-    double temp1, temp2, vel1, vel2;
-    double mach1, mach2;
-    double x_TransmittedSF;                 // X_i -- X-coord of the transmitted shockfront (SF)
-    double y_TransmittedSF;                 // Y_i -- X-coord of the transmitted shockfront (SF)
-    double x_IncidentSF = 0.0;                       // x_i -- X-coord of the Incident shockfront (SF)
-    double y_IncidentSF = 0.0;                       // y_i -- X-coord of the Incident shockfront (SF)
-    double gamma = -atan2(vel1, vel2);
-
-    // temperature in Celcius
-    temp1 = 30.0, temp2 = 300.0;
-
-    // velocity of cool gas (m/s)
-    vel1 = 12.0;
-    mach1 = mach(temp1, speedOfSound(k, gasConst, temp1));
-    mach2 = mach(temp2, speedOfSound(k, gasConst, temp2));
-    vel2 = (sqrt(temp2 / temp1) * (mach2 / mach1)) * vel1;
+    double k = 0.1;
+    double R = 0.3;
+    double N = 100;
+    double M1 = 1.9;
+    double dy = R / N;
+    double T1 = 300, T2 = 3000;
+    double alpha, gamma, lambda = 0.04;
+    double yi, xi;
+    double M1n, M2n;
+    double V2V1;
 
     for (int i = 0; i < numGraphPoints; i++) {
-        x[i] = x_TransmittedSF = (vel2 / vel2) * cos(gamma - 1) * (radius - x_IncidentSF);
-        y[i] = y_TransmittedSF = y_IncidentSF - ((vel2 / vel2) * sin(gamma) * (radius - x_IncidentSF));
-        x_IncidentSF += 0.1;
-        y_IncidentSF += 0.1;
+        yi = i * dy;
+        alpha = asin(yi / R);
+        xi = R * (1 - cos(alpha));
+        M1n = M1 * sin(alpha);
+        M2n = 0.00137077 + 2.92163 * alpha - 4.62126 * pow(alpha, 2.0) + 4.24972 * pow(alpha, 3.0) - 1.86993 * pow(alpha, 4.0) + 0.312301 * pow(alpha, 5.0);
+        gamma = atan((M1n / M2n) * sqrt(T1 / T2) * tan(alpha));
+        V2V1 = sqrt((T2 / T1) * (pow(M2n / M1n, 2) * exp(-pow(yi, 2) / pow(lambda, 2)) * (pow(cos(alpha), 2) + pow(sin(alpha), 2))));
+        x[i] = (xi - k * R) * (1 - V2V1 * cos(gamma));
+        y[i] = yi - V2V1 * (k * R - xi) * sin(gamma);
     }
-
     QPen graphPen;
     ui ->customPlot ->addGraph();
     ui ->customPlot ->graph() ->setName(QString("New graph %1").arg(ui ->customPlot ->graphCount() - 1));
@@ -258,7 +245,6 @@ void MainWindow::contextMenuRequest(QPoint pos) {
     else {
 
         // general context menu on graphs requested
-        pMenu ->addAction("Add random graph", this, SLOT(addRandomGraph()));
         if (ui ->customPlot ->selectedGraphs().size() > 0)
             pMenu ->addAction("Remove selected graph", this, SLOT(removeSelectedGraph()));
         if (ui ->customPlot ->graphCount() > 0)
