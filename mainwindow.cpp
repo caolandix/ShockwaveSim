@@ -176,10 +176,10 @@ void MainWindow::executeGraph() {
     int numGraphPoints = 100;
     QVector<double> x(numGraphPoints), y(numGraphPoints);
     double k = 0.1;
-    double R = 0.3;
+    double radius = 0.3;
     double N = 100;
     double M1 = 1.9;
-    double dy = R / N;
+    double dy = radius / N;
     double T1 = 300, T2 = 3000;
     double alpha, gamma, lambda = 0.04;
     double yi, xi;
@@ -188,14 +188,14 @@ void MainWindow::executeGraph() {
 
     for (int i = 0; i < numGraphPoints; i++) {
         yi = i * dy;
-        alpha = asin(yi / R);
-        xi = R * (1 - cos(alpha));
+        alpha = asin(yi / radius);
+        xi = radius * (1 - cos(alpha));
         M1n = M1 * sin(alpha);
         M2n = 0.00137077 + 2.92163 * alpha - 4.62126 * pow(alpha, 2.0) + 4.24972 * pow(alpha, 3.0) - 1.86993 * pow(alpha, 4.0) + 0.312301 * pow(alpha, 5.0);
         gamma = atan((M1n / M2n) * sqrt(T1 / T2) * tan(alpha));
         V2V1 = sqrt((T2 / T1) * (pow(M2n / M1n, 2) * exp(-pow(yi, 2) / pow(lambda, 2)) * (pow(cos(alpha), 2) + pow(sin(alpha), 2))));
-        x[i] = (xi - k * R) * (1 - V2V1 * cos(gamma));
-        y[i] = yi - V2V1 * (k * R - xi) * sin(gamma);
+        x[i] = (xi - k * radius) * (1 - V2V1 * cos(gamma));
+        y[i] = yi - V2V1 * (k * radius - xi) * sin(gamma);
     }
     QPen graphPen;
     ui ->customPlot ->addGraph();
@@ -207,14 +207,6 @@ void MainWindow::executeGraph() {
     graphPen.setWidthF(3);
     ui ->customPlot ->graph() ->setPen(graphPen);
     ui ->customPlot ->replot();
-}
-
-double MainWindow::speedOfSound(const double gamma, const double gasConst, const double temperature) {
-    return sqrt(gamma * gasConst * (273.15 + temperature));
-}
-
-double MainWindow::mach(const double velocity, const double currSpeedOfSound) {
-    return (currSpeedOfSound != 0.0) ? velocity / currSpeedOfSound : 0.0;
 }
 
 void MainWindow::removeSelectedGraph() {

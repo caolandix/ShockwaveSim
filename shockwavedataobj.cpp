@@ -35,4 +35,8 @@ ShockwaveDataObj::ShockwaveDataObj(const double idealGasConst, const double gamm
     m_Rho = 0.0;
     m_Sigma = 0.0;
 
+    // if we do not have an XML file to feed the various gas types into the app then feed the basic ones
+    if (m_GasTypes.size() == 0) {
+        m_GasTypes.push_back(GasType("Air", 1.4));
+    }
 }

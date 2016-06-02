@@ -1,6 +1,13 @@
 #ifndef SHOCKWAVEDATAOBJ_H
 #define SHOCKWAVEDATAOBJ_H
 
+#include <vector>
+#include <string>
+
+using namespace std;
+
+#include "gastype.h"
+
 
 // This class wraps all of the calculations used in the modelling of the Shockwave propagation. The variables and constants
 // come fromt he paper called Modeling the Propagation of a Shock Wave Through a Glow Discharge by Johnathan Poggie
@@ -9,6 +16,8 @@
 class ShockwaveDataObj {
 public:
     ShockwaveDataObj(const double idealGasConst = 208.13, const double gamma = 1.67);
+
+    vector<GasType> m_GasTypes;
 
     void a(const double val) { m_soundSpeed = val; }
     void B(const double val) { m_magFieldStr = val; }

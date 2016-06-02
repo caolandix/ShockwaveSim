@@ -20,6 +20,7 @@ SOURCES += main.cpp\
     shockwavedataobj.cpp \
     shockwaveparamsdlg.cpp \
     shockregion.cpp \
+    gastype.cpp
 
 HEADERS  += mainwindow.h \
          qcustomplot.h \
@@ -27,6 +28,8 @@ HEADERS  += mainwindow.h \
     shockwavedataobj.h \
     shockwaveparamsdlg.h \
     shockregion.h \
+    gastype.h \
+    commondefs.h
 
 FORMS    += mainwindow.ui \
     shockwaveparamsdlg.ui

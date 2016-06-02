@@ -23,3 +23,11 @@ double ShockWaveCalculations::rhStaticPressure() {
 double ShockWaveCalculations::rhDensityVelocity() {
     return (((m_ShockwaveData.gamma() + 1) * pow(m_ShockwaveData.M(), 2)) / ((m_ShockwaveData.gamma() - 1) * pow(m_ShockwaveData.M(), 2) + 2));
 }
+
+double ShockWaveCalculations::speedOfSound(const double gamma, const double gasConst, const double temperature) {
+    return sqrt(gamma * gasConst * (273.15 + temperature));
+}
+
+double ShockWaveCalculations::mach(const double velocity, const double currSpeedOfSound) {
+    return (currSpeedOfSound != 0.0) ? velocity / currSpeedOfSound : 0.0;
+}

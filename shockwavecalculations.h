@@ -13,6 +13,9 @@ public:
     double rhStaticPressure();
     double rhDensityVelocity();
 
+    double speedOfSound(const double, const double, const double);
+    double mach(const double, const double);
+
 private:
     ShockwaveDataObj m_ShockwaveData;
 };
