@@ -8,6 +8,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     setupGraph();
     setupGraphConnections();
     setupUIComponents();
+
+    m_stgsFile = QString("swAppSettings.xml");
 }
 
 MainWindow::~MainWindow() {
@@ -18,10 +20,148 @@ void MainWindow::setupUIComponents() {
     // setup Menu items with actions
     connect(ui ->actionShockwave_Properties, SIGNAL(triggered()), this, SLOT(onShockwaveProperties()));
     connect(ui ->actionExit, SIGNAL(triggered()), this, SLOT(close()));
+    connect(ui ->actionSave, SIGNAL(triggered()), this, SLOT(onSave()));
+    connect(ui ->actionSave_As, SIGNAL(triggered()), this, SLOT(onSaveAs()));
     connect(ui ->actionAbout, SIGNAL(triggered()), this, SLOT(onAbout()));
     connect(ui ->actionPrint, SIGNAL(triggered()), this, SLOT(onPrint()));
     connect(this, SIGNAL(redrawGraph()), this, SLOT(onRedrawGraph()));
 }
+
+void MainWindow::onSave() {
+    writeDataFile();
+}
+
+void MainWindow::onSaveAs() {
+    m_dataFilename = QFileDialog::getSaveFileName(this, tr("Save Xml"), ".", tr("Xml files (*.xml)"));
+}
+
+void MainWindow::writeSettingsFile() {
+
+
+    QFile file(m_stgsFile);
+    file.open(QIODevice::WriteOnly);
+
+    QXmlStreamWriter xmlWriter(&file);
+    xmlWriter.setAutoFormatting(true);
+    xmlWriter.writeStartDocument();
+
+    xmlWriter.writeStartElement("LAMPS");
+
+    xmlWriter.writeStartElement("LIGHT1");
+    xmlWriter.writeTextElement("State", "statevalue" );
+    xmlWriter.writeTextElement("Room", "roomvalue");
+    xmlWriter.writeTextElement("Potencial", "potencialvalue");
+
+    xmlWriter.writeEndElement();
+
+        file.close();
+}
+
+void MyXMLClass::ReadXMLFile() {
+        QXmlStreamReader Rxml;
+
+        QString filename = QFileDialog::getOpenFileName(this,
+                                   tr("Open Xml"), ".",
+                                   tr("Xml files (*.xml)"));
+
+    QFile file(filename);
+        if (!file.open(QFile::ReadOnly | QFile::Text))
+    {
+        std::cerr << "Error: Cannot read file " << qPrintable(filename)
+                  << ": " << qPrintable(file.errorString())
+                  << std::endl;
+
+    }
+
+    Rxml.setDevice(&file);
+    Rxml.readNext();
+
+    while(!Rxml.atEnd())
+    {
+        if(Rxml.isStartElement())
+        {
+            if(Rxml.name() == "LAMPS")
+            {
+                Rxml.readNext();
+            }
+            else if(Rxml.name() == "LIGHT1")
+            {
+                while(!Rxml.atEnd())
+                            {
+                             if(Rxml.isEndElement())
+                             {
+                             Rxml.readNext();
+                             break;
+                             }
+                             else if(Rxml.isCharacters())
+                             {
+                             Rxml.readNext();
+                             }
+                             else if(Rxml.isStartElement())
+                             {
+                             if(Rxml.name() == "State")
+                             {
+                              ReadStateElement();
+                             }
+                             else if(Rxml.name() == "Room")
+                             {
+                              ReadRoomElement();
+                             }
+                             else if(Rxml.name() == "Potencial")
+                             {
+                                  ReadPotencialElement();
+                             }
+                             Rxml.readNext();
+                         }
+                         else
+                         {
+                         Rxml.readNext();
+                         }
+                    }
+            }
+        }
+    else
+    {
+        Rxml.readNext();
+    }
+
+    file.close();
+
+        if (Rxml.hasError())
+    {
+       std::cerr << "Error: Failed to parse file "
+                 << qPrintable(filename) << ": "
+                 << qPrintable(Rxml.errorString()) << std::endl;
+        }
+    else if (file.error() != QFile::NoError)
+    {
+        std::cerr << "Error: Cannot read file " << qPrintable(filename)
+                  << ": " << qPrintable(file.errorString())
+                  << std::endl;
+    }
+}
+
+//Example for Room Element
+void MyXMLClass::ReadRoomElement() {
+    while (!Rxml.atEnd()) {
+        if (Rxml.isEndElement()) {
+            Rxml.readNext();
+            break;
+        }
+        else if (Rxml.isStartElement()) {
+            QString roomelement = Rxml.readElementText();   //Get the xml value
+            Rxml.readNext();
+            break;
+        }
+        else if (Rxml.isCharacters()) {
+            Rxml.readNext();
+        }
+        else {
+            Rxml.readNext();
+        }
+    }
+}
+
 
 void MainWindow::setupGraphConnections() {
     // connect slot that ties some axis selections together (especially opposite axes):
@@ -172,6 +312,7 @@ void MainWindow::mouseWheel() {
     else
         ui ->customPlot ->axisRect() ->setRangeZoom(Qt::Horizontal | Qt::Vertical);
 }
+
 void MainWindow::executeGraph() {
     int numGraphPoints = 100;
     QVector<double> x(numGraphPoints), y(numGraphPoints);

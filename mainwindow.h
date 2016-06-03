@@ -39,14 +39,21 @@ private slots:
     void contextMenuRequest(QPoint pos);
     void moveLegend();
     void graphClicked(QCPAbstractPlottable *pPlottable);
+    void onRedrawGraph();
+
+    // QMenu items
     void onShockwaveProperties();
     void onAbout();
     void onPrint();
-    void onRedrawGraph();
+    void onSave();
+    void onSaveAs();
 
 private:
     Ui::MainWindow *ui;
     ShockwaveDataObj m_sw;
+    QString m_stgsFile;
+    QString m_dataFilename;
+
 };
 
 #endif // MAINWINDOW_H
