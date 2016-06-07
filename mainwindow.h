@@ -23,6 +23,10 @@ private:
     void setupGraphConnections();
     void setupUIComponents();
 
+    void writeDataFile();
+    void ReadRoomElement(QXmlStreamReader &xmlRdr);
+    void writeSettingsFile();
+    void ReadXMLFile();
 signals:
     void redrawGraph();
 

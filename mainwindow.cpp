@@ -1,6 +1,10 @@
+#include <iostream>
+
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "shockwaveparamsdlg.h"
+
+using namespace std;
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow) {
     ui -> setupUi(this);
@@ -28,16 +32,26 @@ void MainWindow::setupUIComponents() {
 }
 
 void MainWindow::onSave() {
-    writeDataFile();
+    if (m_dataFilename.length() > 0)
+        writeDataFile();
 }
 
 void MainWindow::onSaveAs() {
-    m_dataFilename = QFileDialog::getSaveFileName(this, tr("Save Xml"), ".", tr("Xml files (*.xml)"));
+    m_dataFilename = QFileDialog::getSaveFileName(this, tr("Save XML"), ".", tr("XML files (*.xml)"));
+    if (m_dataFilename.length() > 0) {
+        writeDataFile();
+    }
+}
+
+void MainWindow::writeDataFile() {
+    QFile file(m_dataFilename);
+    if (file.open(QIODevice::WriteOnly)) {
+        QXmlStreamWriter xmlWriter(&file);
+        file.close();
+    }
 }
 
 void MainWindow::writeSettingsFile() {
-
-
     QFile file(m_stgsFile);
     file.open(QIODevice::WriteOnly);
 
@@ -53,111 +67,90 @@ void MainWindow::writeSettingsFile() {
     xmlWriter.writeTextElement("Potencial", "potencialvalue");
 
     xmlWriter.writeEndElement();
-
-        file.close();
+    file.close();
 }
 
-void MyXMLClass::ReadXMLFile() {
-        QXmlStreamReader Rxml;
+void MainWindow::ReadXMLFile() {
+    QXmlStreamReader xmlRdr;
 
-        QString filename = QFileDialog::getOpenFileName(this,
-                                   tr("Open Xml"), ".",
-                                   tr("Xml files (*.xml)"));
+    QString filename = QFileDialog::getOpenFileName(this, tr("Open XML"), ".", tr("XML files (*.xml)"));
 
     QFile file(filename);
-        if (!file.open(QFile::ReadOnly | QFile::Text))
-    {
+    if (!file.open(QFile::ReadOnly | QFile::Text)) {
         std::cerr << "Error: Cannot read file " << qPrintable(filename)
-                  << ": " << qPrintable(file.errorString())
-                  << std::endl;
-
+            << ": " << qPrintable(file.errorString())
+            << std::endl;
     }
 
-    Rxml.setDevice(&file);
-    Rxml.readNext();
+    xmlRdr.setDevice(&file);
+    xmlRdr.readNext();
 
-    while(!Rxml.atEnd())
-    {
-        if(Rxml.isStartElement())
-        {
-            if(Rxml.name() == "LAMPS")
-            {
-                Rxml.readNext();
+    while (!xmlRdr.atEnd()) {
+        if (xmlRdr.isStartElement())  {
+            if (xmlRdr.name() == "LAMPS") {
+                xmlRdr.readNext();
             }
-            else if(Rxml.name() == "LIGHT1")
-            {
-                while(!Rxml.atEnd())
-                            {
-                             if(Rxml.isEndElement())
-                             {
-                             Rxml.readNext();
-                             break;
-                             }
-                             else if(Rxml.isCharacters())
-                             {
-                             Rxml.readNext();
-                             }
-                             else if(Rxml.isStartElement())
-                             {
-                             if(Rxml.name() == "State")
-                             {
-                              ReadStateElement();
-                             }
-                             else if(Rxml.name() == "Room")
-                             {
-                              ReadRoomElement();
-                             }
-                             else if(Rxml.name() == "Potencial")
-                             {
-                                  ReadPotencialElement();
-                             }
-                             Rxml.readNext();
-                         }
-                         else
-                         {
-                         Rxml.readNext();
-                         }
+            else if (xmlRdr.name() == "LIGHT1") {
+                while (!xmlRdr.atEnd()) {
+                    if (xmlRdr.isEndElement()) {
+                        xmlRdr.readNext();
+                        break;
                     }
+                    else if (xmlRdr.isCharacters()) {
+                        xmlRdr.readNext();
+                    }
+                    else if (xmlRdr.isStartElement()) {
+                        if (xmlRdr.name() == "State") {
+                            ReadStateElement();
+                        }
+                        else if (xmlRdr.name() == "Room") {
+                            ReadRoomElement();
+                        }
+                        else if (xmlRdr.name() == "Potencial") {
+                            ReadPotencialElement();
+                        }
+                        xmlRdr.readNext();
+                    }
+                    else {
+                        xmlRdr.readNext();
+                    }
+                }
             }
         }
-    else
-    {
-        Rxml.readNext();
-    }
-
-    file.close();
-
-        if (Rxml.hasError())
-    {
-       std::cerr << "Error: Failed to parse file "
-                 << qPrintable(filename) << ": "
-                 << qPrintable(Rxml.errorString()) << std::endl;
+        else {
+            xmlRdr.readNext();
         }
-    else if (file.error() != QFile::NoError)
-    {
-        std::cerr << "Error: Cannot read file " << qPrintable(filename)
-                  << ": " << qPrintable(file.errorString())
-                  << std::endl;
+        file.close();
+        if (xmlRdr.hasError()) {
+            std::cerr << "Error: Failed to parse file "
+                << qPrintable(filename) << ": "
+                << qPrintable(xmlRdr.errorString()) << std::endl;
+        }
+        else if (file.error() != QFile::NoError) {
+            std::cerr << "Error: Cannot read file " << qPrintable(filename)
+                << ": " << qPrintable(file.errorString())
+                << std::endl;
+        }
     }
 }
 
 //Example for Room Element
-void MyXMLClass::ReadRoomElement() {
-    while (!Rxml.atEnd()) {
-        if (Rxml.isEndElement()) {
-            Rxml.readNext();
+void MainWindow::ReadRoomElement(QXmlStreamReader &xmlRdr) {
+    while (!xmlRdr.atEnd()) {
+        if (xmlRdr.isEndElement()) {
+            xmlRdr.readNext();
             break;
         }
-        else if (Rxml.isStartElement()) {
-            QString roomelement = Rxml.readElementText();   //Get the xml value
-            Rxml.readNext();
+        else if (xmlRdr.isStartElement()) {
+            QString roomelement = xmlRdr.readElementText();   //Get the xml value
+            xmlRdr.readNext();
             break;
         }
-        else if (Rxml.isCharacters()) {
-            Rxml.readNext();
+        else if (xmlRdr.isCharacters()) {
+            xmlRdr.readNext();
         }
         else {
-            Rxml.readNext();
+            xmlRdr.readNext();
         }
     }
 }
