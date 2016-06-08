@@ -101,13 +101,13 @@ void MainWindow::ReadXMLFile() {
                     }
                     else if (xmlRdr.isStartElement()) {
                         if (xmlRdr.name() == "State") {
-                            ReadStateElement();
+                            ;//ReadStateElement(xmlRdr);
                         }
                         else if (xmlRdr.name() == "Room") {
-                            ReadRoomElement();
+                            ReadRoomElement(xmlRdr);
                         }
                         else if (xmlRdr.name() == "Potencial") {
-                            ReadPotencialElement();
+                            ;//ReadPotencialElement(xmlRdr);
                         }
                         xmlRdr.readNext();
                     }
@@ -343,6 +343,19 @@ void MainWindow::executeGraph() {
     ui ->customPlot ->replot();
 }
 
+double MainWindow::transcendental_eq(const double M1n, const double M2n, const double k, const double gamma) {
+    double val1 = 1 / (M1n * (k - 1));
+    double val2 = 2 * k * pow(M1n, 2) - (k - 1);
+    double val3 = (k - 1) * pow(M1n, 2) + 2;
+    double val4 = sqrt(val2 * val3);
+    double val5 = 2 * k * pow(M2n, 2) - (k - 1);
+    double val6 = 2 * k * pow(M1n, 2) - (k - 1);
+    double val7 = pow(val5 / val6, gamma - 1 / 2 * gamma) - 1;
+
+    double retval = val1 * val4 * val7;
+    return retval;
+}
+
 void MainWindow::removeSelectedGraph() {
     if (ui ->customPlot ->selectedGraphs().size() > 0) {
         ui ->customPlot ->removeGraph(ui ->customPlot ->selectedGraphs().first());
@@ -380,8 +393,8 @@ void MainWindow::contextMenuRequest(QPoint pos) {
 }
 
 void MainWindow::moveLegend() {
-    QAction *pAction = NULL;
-    if (pAction = qobject_cast<QAction *>(sender())) {
+    QAction *pAction = qobject_cast<QAction *>(sender());
+    if (pAction) {
 
         // make sure this slot is really called by a context menu action, so it carries the data we need
         bool bOK;

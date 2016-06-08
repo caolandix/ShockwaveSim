@@ -27,6 +27,8 @@ private:
     void ReadRoomElement(QXmlStreamReader &xmlRdr);
     void writeSettingsFile();
     void ReadXMLFile();
+
+    double transcendental_eq(const double M1n, const double M2n, const double k, const double gamma);
 signals:
     void redrawGraph();
 
