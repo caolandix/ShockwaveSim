@@ -13,7 +13,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     setupGraphConnections();
     setupUIComponents();
 
-    m_stgsFile = QString("swAppSettings.xml");
+    m_stgsFile = QString("sw_app_settings.xml");
 }
 
 MainWindow::~MainWindow() {
@@ -38,9 +38,8 @@ void MainWindow::onSave() {
 
 void MainWindow::onSaveAs() {
     m_dataFilename = QFileDialog::getSaveFileName(this, tr("Save XML"), ".", tr("XML files (*.xml)"));
-    if (m_dataFilename.length() > 0) {
+    if (m_dataFilename.length() > 0)
         writeDataFile();
-    }
 }
 
 void MainWindow::writeDataFile() {
@@ -59,9 +58,9 @@ void MainWindow::writeSettingsFile() {
     xmlWriter.setAutoFormatting(true);
     xmlWriter.writeStartDocument();
 
-    xmlWriter.writeStartElement("LAMPS");
+    xmlWriter.writeStartElement("Shockwave");
 
-    xmlWriter.writeStartElement("LIGHT1");
+    xmlWriter.writeStartElement("Properties");
     xmlWriter.writeTextElement("State", "statevalue" );
     xmlWriter.writeTextElement("Room", "roomvalue");
     xmlWriter.writeTextElement("Potencial", "potencialvalue");
@@ -87,39 +86,32 @@ void MainWindow::ReadXMLFile() {
 
     while (!xmlRdr.atEnd()) {
         if (xmlRdr.isStartElement())  {
-            if (xmlRdr.name() == "LAMPS") {
+            if (xmlRdr.name() == "Shockwave")
                 xmlRdr.readNext();
-            }
-            else if (xmlRdr.name() == "LIGHT1") {
+            else if (xmlRdr.name() == "Properties") {
                 while (!xmlRdr.atEnd()) {
                     if (xmlRdr.isEndElement()) {
                         xmlRdr.readNext();
                         break;
                     }
-                    else if (xmlRdr.isCharacters()) {
+                    else if (xmlRdr.isCharacters())
                         xmlRdr.readNext();
-                    }
                     else if (xmlRdr.isStartElement()) {
-                        if (xmlRdr.name() == "State") {
+                        if (xmlRdr.name() == "State")
                             ;//ReadStateElement(xmlRdr);
-                        }
-                        else if (xmlRdr.name() == "Room") {
+                        else if (xmlRdr.name() == "Room")
                             ReadRoomElement(xmlRdr);
-                        }
-                        else if (xmlRdr.name() == "Potencial") {
+                        else if (xmlRdr.name() == "Potencial")
                             ;//ReadPotencialElement(xmlRdr);
-                        }
                         xmlRdr.readNext();
                     }
-                    else {
+                    else
                         xmlRdr.readNext();
-                    }
                 }
             }
         }
-        else {
+        else
             xmlRdr.readNext();
-        }
         file.close();
         if (xmlRdr.hasError()) {
             std::cerr << "Error: Failed to parse file "
@@ -146,12 +138,10 @@ void MainWindow::ReadRoomElement(QXmlStreamReader &xmlRdr) {
             xmlRdr.readNext();
             break;
         }
-        else if (xmlRdr.isCharacters()) {
+        else if (xmlRdr.isCharacters())
             xmlRdr.readNext();
-        }
-        else {
+        else
             xmlRdr.readNext();
-        }
     }
 }
 
@@ -308,12 +298,15 @@ void MainWindow::mouseWheel() {
 
 void MainWindow::executeGraph() {
     int numGraphPoints = 100;
+    // int numGraphPoints = m_sw.numGraphPoints();
     QVector<double> x(numGraphPoints), y(numGraphPoints);
+    QVector<double> trans_eq_l(numGraphPoints), trans_eq_r(numGraphPoints);
     double k = 0.1;
+    // double k = m_sw.
     double radius = 0.3;
-    double N = 100;
+    // double radius = m_sw.R();
     double M1 = 1.9;
-    double dy = radius / N;
+    double dy = radius / numGraphPoints;
     double T1 = 300, T2 = 3000;
     double alpha, gamma, lambda = 0.04;
     double yi, xi;
@@ -330,20 +323,42 @@ void MainWindow::executeGraph() {
         V2V1 = sqrt((T2 / T1) * (pow(M2n / M1n, 2) * exp(-pow(yi, 2) / pow(lambda, 2)) * (pow(cos(alpha), 2) + pow(sin(alpha), 2))));
         x[i] = (xi - k * radius) * (1 - V2V1 * cos(gamma));
         y[i] = yi - V2V1 * (k * radius - xi) * sin(gamma);
+        trans_eq_l[i] = transcendental_eq_left(M1n, M2n, k, gamma);
+        trans_eq_r[i] = transcendental_eq_right(M1n, M2n, T1, T2);
     }
     QPen graphPen;
     ui ->customPlot ->addGraph();
-    ui ->customPlot ->graph() ->setName(QString("New graph %1").arg(ui ->customPlot ->graphCount() - 1));
-    ui ->customPlot ->graph() ->setData(x, y);
-    ui ->customPlot ->graph() ->setLineStyle(QCPGraph::lsNone);
-    ui ->customPlot ->graph() ->setScatterStyle(QCPScatterStyle::ssDot);
+    ui ->customPlot ->graph(0) ->setName(QString("New graph %1").arg(ui ->customPlot ->graphCount() - 1));
+    ui ->customPlot ->graph(0) ->setData(x, y);
+    ui ->customPlot ->graph(0) ->setLineStyle(QCPGraph::lsNone);
+    ui ->customPlot ->graph(0) ->setScatterStyle(QCPScatterStyle::ssDot);
     graphPen.setColor(QColor(Qt::red));
     graphPen.setWidthF(3);
-    ui ->customPlot ->graph() ->setPen(graphPen);
+    ui ->customPlot ->graph(0) ->setPen(graphPen);
+    // ui ->customPlot ->graph(0) ->rescaleAxes();
+
+    ui ->customPlot ->addGraph();
+    ui ->customPlot ->graph(1) ->setData(x, trans_eq_l);
+    ui ->customPlot ->graph(1) ->setLineStyle(QCPGraph::lsNone);
+    ui ->customPlot ->graph(1) ->setScatterStyle(QCPScatterStyle::ssDot);
+    graphPen.setColor(QColor(Qt::darkBlue));
+    graphPen.setWidthF(3);
+    ui ->customPlot ->graph(1) ->setPen(graphPen);
+    // ui ->customPlot ->graph(1) ->rescaleAxes();
+
+    ui ->customPlot ->addGraph();
+    ui ->customPlot ->graph(2) ->setData(x, trans_eq_r);
+    ui ->customPlot ->graph(2) ->setLineStyle(QCPGraph::lsNone);
+    ui ->customPlot ->graph(2) ->setScatterStyle(QCPScatterStyle::ssDot);
+    graphPen.setColor(QColor(Qt::darkGreen));
+    graphPen.setWidthF(3);
+    ui ->customPlot ->graph(2) ->setPen(graphPen);
+    // ui ->customPlot ->graph(2) ->rescaleAxes();
+
     ui ->customPlot ->replot();
 }
 
-double MainWindow::transcendental_eq(const double M1n, const double M2n, const double k, const double gamma) {
+double MainWindow::transcendental_eq_left(const double M1n, const double M2n, const double k, const double gamma) {
     double val1 = 1 / (M1n * (k - 1));
     double val2 = 2 * k * pow(M1n, 2) - (k - 1);
     double val3 = (k - 1) * pow(M1n, 2) + 2;
@@ -355,6 +370,12 @@ double MainWindow::transcendental_eq(const double M1n, const double M2n, const d
     double retval = val1 * val4 * val7;
     return retval;
 }
+
+double MainWindow::transcendental_eq_right(const double M1n, const double M2n, const double T1, const double T2) {
+    double retval = M1n * (1 - (1 / pow(M1n, 2))) - M2n * (1 - (1 / pow(M2n, 2))) * sqrt(T2 / T1);
+    return retval;
+}
+
 
 void MainWindow::removeSelectedGraph() {
     if (ui ->customPlot ->selectedGraphs().size() > 0) {

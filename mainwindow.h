@@ -28,7 +28,8 @@ private:
     void writeSettingsFile();
     void ReadXMLFile();
 
-    double transcendental_eq(const double M1n, const double M2n, const double k, const double gamma);
+    double transcendental_eq_left(const double M1n, const double M2n, const double k, const double gamma);
+    double transcendental_eq_right(const double M1n, const double M2n, const double T1, const double T2);
 signals:
     void redrawGraph();
 
