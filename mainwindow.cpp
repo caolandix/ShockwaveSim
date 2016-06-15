@@ -320,7 +320,7 @@ void MainWindow::executeGraph() {
         M1n = M1 * sin(alpha);
         M2n = 0.00137077 + 2.92163 * alpha - 4.62126 * pow(alpha, 2.0) + 4.24972 * pow(alpha, 3.0) - 1.86993 * pow(alpha, 4.0) + 0.312301 * pow(alpha, 5.0);
         gamma = atan((M1n / M2n) * sqrt(T1 / T2) * tan(alpha));
-        V2V1 = sqrt((T2 / T1) * (pow(M2n / M1n, 2) * exp(-pow(yi, 2) / pow(lambda, 2)) * (pow(cos(alpha), 2) + pow(sin(alpha), 2))));
+        V2V1 = calcV2V1(T1, T2, M1n, M2n, alpha);
         x[i] = (xi - k * radius) * (1 - V2V1 * cos(gamma));
         y[i] = yi - V2V1 * (k * radius - xi) * sin(gamma);
         trans_eq_l[i] = transcendental_eq_left(M1n, M2n, k, gamma);
@@ -328,7 +328,7 @@ void MainWindow::executeGraph() {
     }
     QPen graphPen;
     ui ->customPlot ->addGraph();
-    ui ->customPlot ->graph(0) ->setName(QString("New graph %1").arg(ui ->customPlot ->graphCount() - 1));
+    ui ->customPlot ->graph(0) ->setName(QString("Incidence, Mach, and Temperature Ratios in Dual Media"));
     ui ->customPlot ->graph(0) ->setData(x, y);
     ui ->customPlot ->graph(0) ->setLineStyle(QCPGraph::lsNone);
     ui ->customPlot ->graph(0) ->setScatterStyle(QCPScatterStyle::ssDot);
@@ -338,6 +338,7 @@ void MainWindow::executeGraph() {
     // ui ->customPlot ->graph(0) ->rescaleAxes();
 
     ui ->customPlot ->addGraph();
+    ui ->customPlot ->graph(1) ->setName(QString("Transcendental Left"));
     ui ->customPlot ->graph(1) ->setData(x, trans_eq_l);
     ui ->customPlot ->graph(1) ->setLineStyle(QCPGraph::lsNone);
     ui ->customPlot ->graph(1) ->setScatterStyle(QCPScatterStyle::ssDot);
@@ -347,6 +348,7 @@ void MainWindow::executeGraph() {
     // ui ->customPlot ->graph(1) ->rescaleAxes();
 
     ui ->customPlot ->addGraph();
+    ui ->customPlot ->graph(2) ->setName(QString("Transcendental Right"));
     ui ->customPlot ->graph(2) ->setData(x, trans_eq_r);
     ui ->customPlot ->graph(2) ->setLineStyle(QCPGraph::lsNone);
     ui ->customPlot ->graph(2) ->setScatterStyle(QCPScatterStyle::ssDot);
@@ -356,6 +358,17 @@ void MainWindow::executeGraph() {
     // ui ->customPlot ->graph(2) ->rescaleAxes();
 
     ui ->customPlot ->replot();
+}
+
+double MainWindow::calcV2V1(const double T1, const double T2, const double M1n, const double M2n, const double alpha) {
+    double cos2x = 0.5 * (1 + cos(2 * alpha));
+    double sin2x = 0.5 * (1 - cos(2 * alpha));
+    double val1 = cos2x * (T1 / T2) * pow(M2n / M1n, 2);
+    double val2 = val1 + sin2x;
+    double retVal = sqrt(val2);
+
+    return retVal;
+
 }
 
 double MainWindow::transcendental_eq_left(const double M1n, const double M2n, const double k, const double gamma) {
