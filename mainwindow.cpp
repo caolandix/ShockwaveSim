@@ -301,63 +301,86 @@ void MainWindow::executeGraph() {
     // int numGraphPoints = m_sw.numGraphPoints();
     QVector<double> x(numGraphPoints), y(numGraphPoints);
     QVector<double> trans_eq_l(numGraphPoints), trans_eq_r(numGraphPoints);
+    QVector<double> disp_sf_x(numGraphPoints), disp_sf_y(numGraphPoints);
     double k = 0.1;
-    // double k = m_sw.
     double radius = 0.3;
-    // double radius = m_sw.R();
     double M1 = 1.9;
     double dy = radius / numGraphPoints;
     double T1 = 300, T2 = 3000;
     double alpha, gamma, lambda = 0.04;
     double yi, xi;
     double M1n, M2n;
+    double M1t;
     double V2V1;
+    double M2;
+    double V2 = calcSpeedOfSound(T2);
+    double V1;
 
-    for (int i = 0; i < numGraphPoints; i++) {
-        yi = i * dy;
-        alpha = asin(yi / radius);
-        xi = radius * (1 - cos(alpha));
-        M1n = M1 * sin(alpha);
-        M2n = 0.00137077 + 2.92163 * alpha - 4.62126 * pow(alpha, 2.0) + 4.24972 * pow(alpha, 3.0) - 1.86993 * pow(alpha, 4.0) + 0.312301 * pow(alpha, 5.0);
-        gamma = atan((M1n / M2n) * sqrt(T1 / T2) * tan(alpha));
-        V2V1 = calcV2V1(T1, T2, M1n, M2n, alpha);
-        x[i] = (xi - k * radius) * (1 - V2V1 * cos(gamma));
-        y[i] = yi - V2V1 * (k * radius - xi) * sin(gamma);
-        trans_eq_l[i] = transcendental_eq_left(M1n, M2n, k, gamma);
-        trans_eq_r[i] = transcendental_eq_right(M1n, M2n, T1, T2);
-    }
     QPen graphPen;
+    graphPen.setWidthF(3);
+
     ui ->customPlot ->addGraph();
+    ui ->customPlot ->addGraph();
+    ui ->customPlot ->addGraph();
+    ui ->customPlot ->addGraph();
+
     ui ->customPlot ->graph(0) ->setName(QString("Incidence, Mach, and Temperature Ratios in Dual Media"));
-    ui ->customPlot ->graph(0) ->setData(x, y);
-    ui ->customPlot ->graph(0) ->setLineStyle(QCPGraph::lsNone);
-    ui ->customPlot ->graph(0) ->setScatterStyle(QCPScatterStyle::ssDot);
-    graphPen.setColor(QColor(Qt::red));
-    graphPen.setWidthF(3);
-    ui ->customPlot ->graph(0) ->setPen(graphPen);
-    // ui ->customPlot ->graph(0) ->rescaleAxes();
+    ui ->customPlot ->graph(0) ->setLineStyle(QCPGraph::lsLine);
+    ui ->customPlot ->graph(0) ->setScatterStyle(QCPScatterStyle::ssDiamond);
 
-    ui ->customPlot ->addGraph();
     ui ->customPlot ->graph(1) ->setName(QString("Transcendental Left"));
-    ui ->customPlot ->graph(1) ->setData(x, trans_eq_l);
-    ui ->customPlot ->graph(1) ->setLineStyle(QCPGraph::lsNone);
+    ui ->customPlot ->graph(1) ->setLineStyle(QCPGraph::lsLine);
     ui ->customPlot ->graph(1) ->setScatterStyle(QCPScatterStyle::ssDot);
-    graphPen.setColor(QColor(Qt::darkBlue));
-    graphPen.setWidthF(3);
-    ui ->customPlot ->graph(1) ->setPen(graphPen);
-    // ui ->customPlot ->graph(1) ->rescaleAxes();
 
-    ui ->customPlot ->addGraph();
     ui ->customPlot ->graph(2) ->setName(QString("Transcendental Right"));
-    ui ->customPlot ->graph(2) ->setData(x, trans_eq_r);
-    ui ->customPlot ->graph(2) ->setLineStyle(QCPGraph::lsNone);
-    ui ->customPlot ->graph(2) ->setScatterStyle(QCPScatterStyle::ssDot);
-    graphPen.setColor(QColor(Qt::darkGreen));
-    graphPen.setWidthF(3);
-    ui ->customPlot ->graph(2) ->setPen(graphPen);
-    // ui ->customPlot ->graph(2) ->rescaleAxes();
+    ui ->customPlot ->graph(2) ->setLineStyle(QCPGraph::lsLine);
+    ui ->customPlot ->graph(2) ->setScatterStyle(QCPScatterStyle::ssCircle);
 
-    ui ->customPlot ->replot();
+    ui ->customPlot ->graph(3) ->setName(QString("Dispersion Shockwave"));
+    ui ->customPlot ->graph(3) ->setLineStyle(QCPGraph::lsLine);
+    ui ->customPlot ->graph(3) ->setScatterStyle(QCPScatterStyle::ssCrossCircle);
+
+
+    for (double dt = 0.05; dt <= 0.5; dt += 0.05) {
+        for (int i = 0; i < numGraphPoints; i++) {
+            yi = i * dy;
+            alpha = asin(yi / radius);
+            xi = radius * (1 - cos(alpha));
+            M1n = M1 * sin(alpha);
+            M2n = 0.00137077 + 2.92163 * alpha - 4.62126 * pow(alpha, 2.0) + 4.24972 * pow(alpha, 3.0) - 1.86993 * pow(alpha, 4.0) + 0.312301 * pow(alpha, 5.0);
+            gamma = atan((M1n / M2n) * sqrt(T1 / T2) * tan(alpha));
+            V2V1 = calcV2V1(T1, T2, M1n, M2n, alpha);
+            x[i] = (xi - k * radius) * (1 - V2V1 * cos(gamma));
+            y[i] = yi - V2V1 * (k * radius - xi) * sin(gamma);
+            trans_eq_l[i] = transcendental_eq_left(M1n, M2n, k, gamma);
+            trans_eq_r[i] = transcendental_eq_right(M1n, M2n, T1, T2);
+            M2 = sqrt(pow(M2n, 2) * pow(M1t, 2));
+            V1 = V2 * (sqrt(T2 / T1) * (M2 / M1));
+            disp_sf_x[i] = (xi * (V1 - V2 * cos(gamma))) / V1 + (dt * (V2 * cos(gamma) - V1));
+            disp_sf_y[i] = yi - V2 * sin(gamma) * (dt - (xi / V1));
+        }
+        graphPen.setColor(QColor(Qt::red));
+        ui ->customPlot ->graph(0) ->setData(x, y);
+        ui ->customPlot ->graph(0) ->setPen(graphPen);
+
+        graphPen.setColor(QColor(Qt::darkBlue));
+        ui ->customPlot ->graph(1) ->setData(x, trans_eq_l);
+        ui ->customPlot ->graph(1) ->setPen(graphPen);
+
+        graphPen.setColor(QColor(Qt::darkGreen));
+        ui ->customPlot ->graph(2) ->setData(x, trans_eq_r);
+        ui ->customPlot ->graph(2) ->setPen(graphPen);
+
+        graphPen.setColor(QColor(Qt::cyan));
+        ui ->customPlot ->graph(3) ->setData(disp_sf_x, disp_sf_y);
+        ui ->customPlot ->graph(3) ->setPen(graphPen);
+
+        ui ->customPlot ->replot();
+    }
+}
+
+double MainWindow::calcSpeedOfSound(const double T) {
+    return 643.855 * sqrt(T / 273.15);
 }
 
 double MainWindow::calcV2V1(const double T1, const double T2, const double M1n, const double M2n, const double alpha) {
