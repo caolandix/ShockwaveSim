@@ -354,6 +354,7 @@ void MainWindow::executeGraph() {
             y[i] = yi - V2V1 * (k * radius - xi) * sin(gamma);
             trans_eq_l[i] = transcendental_eq_left(M1n, M2n, k, gamma);
             trans_eq_r[i] = transcendental_eq_right(M1n, M2n, T1, T2);
+            M1t = M1 * sin(alpha);
             M2 = sqrt(pow(M2n, 2) * pow(M1t, 2));
             V1 = V2 * (sqrt(T2 / T1) * (M2 / M1));
             disp_sf_x[i] = (xi * (V1 - V2 * cos(gamma))) / V1 + (dt * (V2 * cos(gamma) - V1));
@@ -395,6 +396,10 @@ double MainWindow::calcV2V1(const double T1, const double T2, const double M1n, 
 }
 
 double MainWindow::transcendental_eq_left(const double M1n, const double M2n, const double k, const double gamma) {
+
+    double retval = (1 / (M1n * (k - 1))) * sqrt((2 * k * pow(M1n, 2) - (k - 1)) * ((k - 1) * pow(M1n, 2) + 2)) *
+            pow(((2 * k * pow(M2n, 2) - (k - 1)) / (2 * k * pow(M1n, 2) - (k - 1))), gamma - (1 / 2 * gamma)) - 1;
+/*
     double val1 = 1 / (M1n * (k - 1));
     double val2 = 2 * k * pow(M1n, 2) - (k - 1);
     double val3 = (k - 1) * pow(M1n, 2) + 2;
@@ -404,12 +409,12 @@ double MainWindow::transcendental_eq_left(const double M1n, const double M2n, co
     double val7 = pow(val5 / val6, gamma - 1 / 2 * gamma) - 1;
 
     double retval = val1 * val4 * val7;
+    */
     return retval;
 }
 
 double MainWindow::transcendental_eq_right(const double M1n, const double M2n, const double T1, const double T2) {
-    double retval = M1n * (1 - (1 / pow(M1n, 2))) - M2n * (1 - (1 / pow(M2n, 2))) * sqrt(T2 / T1);
-    return retval;
+    return M1n * (1 - (1 / pow(M1n, 2))) - M2n * (1 - (1 / pow(M2n, 2))) * sqrt(T2 / T1);
 }
 
 
