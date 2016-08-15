@@ -340,7 +340,7 @@ void MainWindow::executeGraph() {
     ui ->customPlot ->graph(3) ->setLineStyle(QCPGraph::lsLine);
     ui ->customPlot ->graph(3) ->setScatterStyle(QCPScatterStyle::ssCrossCircle);
 
-
+/*
     for (double dt = 0.05; dt <= 0.5; dt += 0.05) {
         for (int i = 0; i < numGraphPoints; i++) {
             yi = i * dy;
@@ -361,10 +361,6 @@ void MainWindow::executeGraph() {
             disp_sf_y[i] = yi - V2 * sin(gamma) * (dt - (xi / V1));
         }
         graphPen.setColor(QColor(Qt::red));
-        ui ->customPlot ->graph(0) ->setData(x, y);
-        ui ->customPlot ->graph(0) ->setPen(graphPen);
-
-        graphPen.setColor(QColor(Qt::darkBlue));
         ui ->customPlot ->graph(1) ->setData(x, trans_eq_l);
         ui ->customPlot ->graph(1) ->setPen(graphPen);
 
@@ -372,12 +368,33 @@ void MainWindow::executeGraph() {
         ui ->customPlot ->graph(2) ->setData(x, trans_eq_r);
         ui ->customPlot ->graph(2) ->setPen(graphPen);
 
+        graphPen.setColor(QColor(Qt::darkBlue));
+        ui ->customPlot ->graph(0) ->setData(x, y);
+        ui ->customPlot ->graph(0) ->setPen(graphPen);
+
         graphPen.setColor(QColor(Qt::cyan));
         ui ->customPlot ->graph(3) ->setData(disp_sf_x, disp_sf_y);
         ui ->customPlot ->graph(3) ->setPen(graphPen);
 
         ui ->customPlot ->replot();
     }
+    */
+    int i = 0;
+    for (M2n = 1.5; M2n <= 3.0; M2n += 0.05) {
+        for (M1n = 1.7; M1n <= 2.2; M1n += 0.05) {
+            trans_eq_l[i] = transcendental_eq_left(M1n, M2n, k);
+            trans_eq_r[i] = transcendental_eq_right(M1n, M2n, T1, T2);
+            i++;
+        }
+    }
+    graphPen.setColor(QColor(Qt::red));
+    ui ->customPlot ->graph(1) ->setData(x, trans_eq_l);
+    ui ->customPlot ->graph(1) ->setPen(graphPen);
+
+    graphPen.setColor(QColor(Qt::darkGreen));
+    ui ->customPlot ->graph(2) ->setData(x, trans_eq_r);
+    ui ->customPlot ->graph(2) ->setPen(graphPen);
+    ui ->customPlot ->replot();
 }
 
 double MainWindow::calcSpeedOfSound(const double T) {
@@ -395,21 +412,10 @@ double MainWindow::calcV2V1(const double T1, const double T2, const double M1n, 
 
 }
 
-double MainWindow::transcendental_eq_left(const double M1n, const double M2n, const double k, const double gamma) {
+double MainWindow::transcendental_eq_left(const double M1n, const double M2n, const double k) {
 
     double retval = (1 / (M1n * (k - 1))) * sqrt((2 * k * pow(M1n, 2) - (k - 1)) * ((k - 1) * pow(M1n, 2) + 2)) *
-            pow(((2 * k * pow(M2n, 2) - (k - 1)) / (2 * k * pow(M1n, 2) - (k - 1))), gamma - (1 / 2 * gamma)) - 1;
-/*
-    double val1 = 1 / (M1n * (k - 1));
-    double val2 = 2 * k * pow(M1n, 2) - (k - 1);
-    double val3 = (k - 1) * pow(M1n, 2) + 2;
-    double val4 = sqrt(val2 * val3);
-    double val5 = 2 * k * pow(M2n, 2) - (k - 1);
-    double val6 = 2 * k * pow(M1n, 2) - (k - 1);
-    double val7 = pow(val5 / val6, gamma - 1 / 2 * gamma) - 1;
-
-    double retval = val1 * val4 * val7;
-    */
+            pow(((2 * k * pow(M2n, 2) - (k - 1)) / (2 * k * pow(M1n, 2) - (k - 1))), k - (1 / 2 * k)) - 1;
     return retval;
 }
 
