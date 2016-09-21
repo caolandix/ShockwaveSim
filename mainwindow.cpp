@@ -329,11 +329,11 @@ void MainWindow::executeGraph() {
     ui ->customPlot ->graph(0) ->setScatterStyle(QCPScatterStyle::ssDiamond);
 
     ui ->customPlot ->graph(1) ->setName(QString("Transcendental Left"));
-    ui ->customPlot ->graph(1) ->setLineStyle(QCPGraph::lsLine);
+    ui ->customPlot ->graph(1) ->setLineStyle(QCPGraph::lsNone);
     ui ->customPlot ->graph(1) ->setScatterStyle(QCPScatterStyle::ssCrossCircle);
 
     ui ->customPlot ->graph(2) ->setName(QString("Transcendental Right"));
-    ui ->customPlot ->graph(2) ->setLineStyle(QCPGraph::lsLine);
+    ui ->customPlot ->graph(2) ->setLineStyle(QCPGraph::lsNone);
     ui ->customPlot ->graph(2) ->setScatterStyle(QCPScatterStyle::ssDiamond);
 
     ui ->customPlot ->graph(3) ->setName(QString("Dispersion Shockwave"));
@@ -390,15 +390,14 @@ void MainWindow::executeGraph() {
     ui ->customPlot ->graph(1) ->setPen(graphPen);
 
     i = 0, j = 0;
-    M1n = 1.0;
+    M1n = 0.9;
     for (M2n = 1.0; M2n <= 3.0; M2n += 0.01) {
-        trans_eq_r[i++] = transcendental_eq_right(M1n, M2n, T1, T2);
+        trans_eq_r[i++] = transcendental_eq_right(trans_eq_l[i], M2n, T1, T2);
         x[j++] = M2n;
     }
     graphPen.setColor(QColor(Qt::darkGreen));
     ui ->customPlot ->graph(2) ->setData(x, trans_eq_r);
     ui ->customPlot ->graph(2) ->setPen(graphPen);
-
     ui ->customPlot ->replot();
 }
 double MainWindow::transcendental_eq_left(const double M1n, const double M2n, const double k) {
