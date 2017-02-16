@@ -329,11 +329,11 @@ void MainWindow::executeGraph() {
     ui ->customPlot ->graph(0) ->setScatterStyle(QCPScatterStyle::ssDiamond);
 
     ui ->customPlot ->graph(1) ->setName(QString("Transcendental Left"));
-    ui ->customPlot ->graph(1) ->setLineStyle(QCPGraph::lsLine);
+    ui ->customPlot ->graph(1) ->setLineStyle(QCPGraph::lsNone);
     ui ->customPlot ->graph(1) ->setScatterStyle(QCPScatterStyle::ssCrossCircle);
 
     ui ->customPlot ->graph(2) ->setName(QString("Transcendental Right"));
-    ui ->customPlot ->graph(2) ->setLineStyle(QCPGraph::lsLine);
+    ui ->customPlot ->graph(2) ->setLineStyle(QCPGraph::lsNone);
     ui ->customPlot ->graph(2) ->setScatterStyle(QCPScatterStyle::ssDiamond);
 
     ui ->customPlot ->graph(3) ->setName(QString("Dispersion Shockwave"));
@@ -379,27 +379,54 @@ void MainWindow::executeGraph() {
         ui ->customPlot ->replot();
     }
     */
-    int i = 0, j = 0;
-    M2n = 1.0;
-    for (M1n = 1.0; M1n <= 2.8; M1n += 0.01) {
-        trans_eq_l[i++] = transcendental_eq_left(M1n, M2n, k);
-        x[j++] = M1n;
-    }
-    graphPen.setColor(QColor(Qt::red));
-    ui ->customPlot ->graph(1) ->setData(x, trans_eq_l);
-    ui ->customPlot ->graph(1) ->setPen(graphPen);
+//    for (M2n = 1.9; M2n <= 3.0; M2n += 0.01) {
+        int i = 0, j = 0;
+        QVector<QVector<double>> trans_eqs_left(2);
+        QVector<QVector<double>> vecMs(2);
 
+
+        M2n = 1.9;
+        for (M1n = 1.5; M1n <= 2.8; M1n += 0.01) {
+            trans_eq_l[i++] = transcendental_eq_left(M1n, M2n, k);
+            x[j++] = M1n;
+        }
+        x.resize(j);
+        vecMs[0] = x;
+        trans_eqs_left[0] = trans_eq_l;
+        graphPen.setColor(QColor(Qt::red));
+        ui ->customPlot ->graph(0) ->setData(vecMs[0], trans_eqs_left[0]);
+        ui ->customPlot ->graph(0) ->setPen(graphPen);
+
+        i = j = 0;
+        M2n = 2.5;
+        for (M1n = 1.5; M1n <= 2.8; M1n += 0.01) {
+            trans_eq_l[i++] = transcendental_eq_left(M1n, M2n, k);
+            x[j++] = M1n;
+        }
+        x.resize(j);
+        vecMs[1] = x;
+        trans_eqs_left[1] = trans_eq_l;
+        graphPen.setColor(QColor(Qt::blue));
+        ui ->customPlot ->graph(1) ->setData(vecMs[1], trans_eqs_left[1]);
+        ui ->customPlot ->graph(1) ->setPen(graphPen);
+
+        //x.resize(numGraphPoints);
+//    }
+    ui ->customPlot ->replot();
+/*
     i = 0, j = 0;
-    M1n = 1.0;
-    for (M2n = 1.0; M2n <= 3.0; M2n += 0.01) {
+    M1n = 1.5;
+    x.resize(numGraphPoints);
+    for (M2n = 1.9; M2n <= 3.0; M2n += 0.01) {
         trans_eq_r[i++] = transcendental_eq_right(M1n, M2n, T1, T2);
         x[j++] = M2n;
     }
+    x.resize(j);
     graphPen.setColor(QColor(Qt::darkGreen));
     ui ->customPlot ->graph(2) ->setData(x, trans_eq_r);
     ui ->customPlot ->graph(2) ->setPen(graphPen);
-
     ui ->customPlot ->replot();
+    */
 }
 double MainWindow::transcendental_eq_left(const double M1n, const double M2n, const double k) {
     double val1 = 1 / (M1n * (k - 1));
